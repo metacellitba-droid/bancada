@@ -40,19 +40,24 @@ summary.s{list-style:none;display:inline-block;color:var(--pri);border:1px solid
 .topo{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.topo h1{margin:0 0 10px}
 #nuv{font-size:13px;color:var(--mut);margin-bottom:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 #login{position:fixed;inset:0;z-index:50;background:var(--bg);display:none;overflow:auto;padding:16px}
+#prt{display:none}
+#rec{display:none;position:fixed;inset:0;z-index:60;background:#fff;color:#000;overflow:auto}@media print{#prt .card{background:#fff!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0 0 8px}#prt *{color:#000!important}#prt button{display:none!important}#rec{position:static}.noprt{display:none}}
+@media print{#prt h2{font-size:14px;border-bottom:1px solid #000;margin:12px 0 6px;padding-bottom:2px}#prt .gr{display:grid;grid-template-columns:repeat(3,1fr);gap:3px 12px}#prt .gr2{display:grid;grid-template-columns:1fr 1fr;gap:3px 12px}#prt ol{margin:4px 0;padding-left:18px}}
+@media print{body>*:not(#prt):not(#rec){display:none!important}#prt{display:block!important;color:#000;background:#fff;font:13px/1.4 Arial,sans-serif}#prt h1{font-size:20px;margin:0 0 4px}#prt table{border-collapse:collapse;width:100%;margin:6px 0}#prt td,#prt th{border:1px solid #444;padding:4px 6px;text-align:left}#prt .ass{display:flex;gap:30px;margin-top:46px}#prt .ass div{flex:1;border-top:1px solid #000;text-align:center;padding-top:4px}}
 </style>
 </head>
 <body>
-<header><div class="topo"><h1>Bancada: assistência técnica</h1><div id="nuv"></div></div>
-<nav id="nav"><button data-t="nova" class="on">Nova O.S.</button><button data-t="lista">Ordens de serviço</button><button data-t="pdv">Acessórios</button><button data-t="rel">Relatórios</button><button data-t="proj">Projeções</button></nav></header>
-<main>
+<header><div class="topo"><h1><img id="logoTop" alt="" style="display:none;height:34px;vertical-align:middle;margin-right:8px"><span id="nomeTop">Bancada: assistência técnica</span></h1><div id="nuv"></div></div>
+<nav id="nav"><button data-t="nova" class="on">Nova O.S.</button><button data-t="lista">Ordens de serviço</button><button data-t="pdv">Acessórios</button><button data-t="rel">Relatórios</button><button data-t="proj">Projeções</button><button data-t="clientes">Clientes</button><button data-t="lixeira">Lixeira</button><button data-t="loja">Loja</button></nav></header>
+<main><div id="aniv"></div>
 <section id="nova" class="on"><div class="card"><h2>Dados do cliente e do aparelho</h2><div class="g">
-<label>Data de entrada<input id="dt" type="date"></label><label>Nome do cliente<input id="cli"></label><label>Telefone<input id="tel" inputmode="tel"></label>
+<label>Data de entrada<input id="dt" type="date"></label><label>Nome do cliente<input id="cli"></label><label>Telefone<input id="tel" inputmode="tel"></label><label>Telefone 2 (opcional)<input id="tel2" inputmode="tel" placeholder="Ex.: número do chip deixado no aparelho"></label><label>Data de nascimento (opcional)<input id="nasc" type="date"></label>
 <label>Marca<input id="marca" list="dlMarca"></label><label>Modelo<input id="modelo" list="dlModelo" placeholder="Digite: se for novo, fica salvo"></label>
 <label>IMEI ou série<input id="imei"></label><label>Senha do aparelho<input id="senha"></label></div>
 <label style="margin-top:10px">Defeito relatado<input id="defeito" placeholder="Ex.: troca de tela"></label></div>
 <div class="card"><h2>Checklist de entrada</h2><div class="ck" id="ckEnt"></div>
-<label style="margin-top:10px">Observações da entrada<textarea id="obs" rows="2" placeholder="Ex.: tela trincada, carcaça amassada"></textarea></label></div>
+<label style="margin-top:10px">Observações da entrada<textarea id="obs" rows="2" placeholder="Ex.: tela trincada, carcaça amassada"></textarea></label>
+<label style="display:block;margin-top:10px">Fotos do aparelho (só você vê: não saem na impressão nem no comprovante)<input type="file" id="fotoIn" accept="image/*" multiple></label><div id="fotoPrev"></div></div>
 <div class="card"><h2>Peça, valores e lucro</h2><div class="g">
 <label>Fornecedor<input id="sup" list="dlSup" placeholder="Digite: se for novo, fica salvo"></label>
 <label style="display:flex;gap:8px;align-items:center;margin-top:22px"><input type="checkbox" id="own" style="width:auto;margin:0">Peça própria ou retirada (custo R$ 0,00)</label>
@@ -73,13 +78,22 @@ summary.s{list-style:none;display:inline-block;color:var(--pri);border:1px solid
 <label>Número da O.S. (opcional)<input id="so" type="number" min="1"></label></div><p><button class="b" id="vender">Registrar venda</button></p></div>
 <div class="card"><h2>Estoque</h2><div class="wrap" id="estoque"></div></div></section>
 
-<section id="rel"><div class="card row"><h2 style="margin:0">Relatórios</h2><label style="margin:0">Mostrar<select id="vis"><option value="t">Tudo (serviços e acessórios)</option><option value="s">Serviços</option><option value="a">Acessórios</option></select></label><label style="margin:0">Período<select id="per"><option value="d">Hoje (diário)</option><option value="w">Esta semana (semanal)</option><option value="m">Este mês (mensal)</option><option value="y">Este ano (anual)</option><option value="all" selected>Tudo</option><option value="c">Personalizado (de/até)</option></select></label><label class="cu" style="margin:0;display:none">De<input type="date" id="de"></label><label class="cu" style="margin:0;display:none">Até<input type="date" id="ate"></label></div><div id="relOut"></div></section>
+<section id="rel"><div class="card row"><h2 style="margin:0">Relatórios</h2><label style="margin:0">Mostrar<select id="vis"><option value="t">Tudo (serviços e acessórios)</option><option value="s">Serviços</option><option value="a">Acessórios</option></select></label><label style="margin:0">Período<select id="per"><option value="d">Hoje (diário)</option><option value="w">Esta semana (semanal)</option><option value="m">Este mês (mensal)</option><option value="y">Este ano (anual)</option><option value="all" selected>Tudo</option><option value="c">Personalizado (de/até)</option></select></label><label class="cu" style="margin:0;display:none">De<input type="date" id="de"></label><label class="cu" style="margin:0;display:none">Até<input type="date" id="ate"></label></div><button class="b noprt" id="relPrint" style="margin:0 0 8px">🖨 Imprimir relatório</button><div id="relOut"></div></section>
 <section id="proj"><div class="card row"><h2 style="margin:0">Projeções</h2><label style="margin:0">Período (pelo vencimento)<select id="pper"><option value="all" selected>Tudo</option><option value="m">Este mês</option><option value="30">Próximos 30 dias</option><option value="90">Próximos 90 dias</option><option value="c">Personalizado (de/até)</option></select></label><label class="cp" style="margin:0;display:none">De<input type="date" id="pde"></label><label class="cp" style="margin:0;display:none">Até<input type="date" id="pate"></label></div><div id="projOut"></div></section>
+<section id="clientes"><div class="card"><h2>Clientes cadastrados</h2><div class="g"><label>Buscar por nome ou telefone<input id="cliBusca" placeholder="Digite para buscar"></label></div><p style="margin:10px 0 0"><button class="b" data-cn="1">Novo cliente</button></p><datalist id="dlCli"></datalist></div><div id="cliForm"></div><div id="cliOut"></div></section>
+<section id="loja"><div class="card"><h2>Dados da loja</h2><div class="g"><label>Nome da loja<input id="lojaNome" placeholder="Aparece no topo e na O.S. impressa"></label><label>Telefone/WhatsApp da loja<input id="lojaTel" placeholder="Aparece no comprovante de garantia"></label></div>
+<p style="margin:12px 0 4px"><b>Logo</b> (PNG ou JPG; é reduzida automaticamente)</p><img id="lojaPrev" alt="Logo" style="max-width:220px;max-height:110px;display:none;margin-bottom:8px"><div><input type="file" id="lojaLogo" accept="image/png,image/jpeg"></div><p style="margin:10px 0 0"><button class="s" id="lojaRem">Remover logo</button></p></div>
+<div class="card"><h2>Backup dos dados</h2><p style="color:var(--mut);margin:0 0 8px">Baixa um arquivo com O.S., clientes, produtos e vendas. As fotos não vão no arquivo.</p><p style="margin:0"><button class="b" id="bkBaixar">Baixar backup</button></p><p style="margin:12px 0 4px"><b>Restaurar</b></p><input type="file" id="bkArq" accept=".json,application/json"><div id="bkInfo" style="color:var(--mut);margin:6px 0"></div><button class="s" id="bkRest">Restaurar backup</button></div></section>
+<section id="lixeira"><div id="lixOut"></div></section>
 </main>
-<div id="login"><div class="card" style="max-width:380px;margin:8vh auto"><h2>Bancada: assistência técnica</h2><p style="color:var(--mut)">Entre com o e-mail e a senha da sua loja. Cada loja só enxerga os próprios dados.</p>
+<div id="rec"></div>
+<div id="fgr" style="display:none;position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.88);align-items:center;justify-content:center"><img alt="Foto" style="max-width:96%;max-height:96%"></div>
+<div id="prt"></div>
+<div id="login"><div class="card" id="lcard" style="max-width:380px;margin:8vh auto"><h2>Bancada: assistência técnica</h2><p style="color:var(--mut)">Entre com o e-mail e a senha da sua loja. Cada loja só enxerga os próprios dados.</p>
 <label>E-mail<input id="lemail" type="email" autocomplete="username"></label><label style="margin-top:8px">Senha (mínimo 6 caracteres)<input id="lsenha" type="password" autocomplete="current-password"></label>
 <label id="limpl" style="display:none;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="limp" style="width:auto;margin:0">Importar os dados já salvos neste navegador (só na primeira vez)</label>
-<p id="lmsg" role="alert" style="color:var(--bad);min-height:1.4em"></p><div style="display:flex;gap:8px"><button class="b" id="lent">Entrar</button><button class="s" id="lcad">Criar conta</button></div></div></div>
+<p id="lmsg" role="alert" style="color:var(--bad);min-height:1.4em"></p><div style="display:flex;gap:8px"><button class="b" id="lent">Entrar</button><button class="s" id="lcad">Criar conta</button><button class="s" id="lesq">Esqueci a senha</button></div></div>
+<div class="card" id="lnova" style="display:none;max-width:380px;margin:8vh auto"><h2>Criar nova senha</h2><label>Nova senha (mínimo 6 caracteres)<input id="lnsenha" type="password" autocomplete="new-password"></label><p id="lnmsg" role="alert" style="color:var(--bad);min-height:1.4em"></p><button class="b" id="lnok">Salvar nova senha</button></div></div>
 <div id="toast" role="status"></div><datalist id="dlMarca"></datalist><datalist id="dlModelo"></datalist><datalist id="dlSup"></datalist>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
@@ -90,7 +104,8 @@ if(!db.v){db.os.forEach(o=>{if(o.st==1)o.st=2;else if(o.st==2)o.st=1;if(!o.pg)o.
 /* ===== Nuvem (Supabase) ===== */
 const SUPA='https://xhbjsbyahavthrohchjx.supabase.co',KEY='sb_publishable_jUhP6z3YsTYhbQ2XHmOhpQ_qk-bXKT9';
 const legado=(db.os.length||db.prod.length||db.sales.length)?JSON.parse(JSON.stringify(db)):null;
-const vazio=()=>({os:[],models:[],brands:[],sup:[],prod:[],sales:[],n:1,v:2});
+db.cli=db.cli||[];db.lix=db.lix||[];db.cfg=db.cfg||{nome:'',logo:''};
+const vazio=()=>({os:[],models:[],brands:[],sup:[],prod:[],sales:[],cli:[],lix:[],cfg:{nome:'',logo:''},n:1,v:2});
 const NUV={ses:null,ver:null,pend:false,busy:false,tmr:null,est:'ok'};
 try{NUV.ses=JSON.parse(localStorage.getItem('bancada_sessao'))}catch(e){}
 function save(){try{if(NUV.ses){localStorage.setItem('bancada_'+NUV.ses.user.id,JSON.stringify(db));localStorage.setItem('bancada_p_'+NUV.ses.user.id,'1')}}catch(e){}if(NUV.ses){NUV.pend=true;nuvStatus('salvando');clearTimeout(NUV.tmr);NUV.tmr=setTimeout(nuvEnviar,700)}}
@@ -105,20 +120,32 @@ async function nuvCarregar(importar){const u=NUV.ses.user.id;
  try{const r=await nuvApi('/rest/v1/lojas_dados?select=dados,atualizado_em&user_id=eq.'+u);
   if(r.s==401){nuvSair(true);return false}
   if(!r.ok)throw r;
-  if(r.j.length){db=r.j[0].dados&&r.j[0].dados.os?r.j[0].dados:vazio();NUV.ver=r.j[0].atualizado_em;nuvStatus('ok');let c=null;try{if(localStorage.getItem('bancada_p_'+u))c=JSON.parse(localStorage.getItem('bancada_'+u))}catch(x){}if(c&&c.os){db=c;setTimeout(nuvEnviar,200)}}
-  else{db=(importar&&$('#limp').checked&&legado)?legado:vazio();NUV.ver=null;db.v=2;await nuvEnviar()}
+  if(r.j.length){db=r.j[0].dados&&r.j[0].dados.os?r.j[0].dados:vazio();NUV.base=JSON.stringify(db);NUV.ver=r.j[0].atualizado_em;nuvStatus('ok');let c=null;try{if(localStorage.getItem('bancada_p_'+u))c=JSON.parse(localStorage.getItem('bancada_'+u))}catch(x){}if(c&&c.os){db=c;setTimeout(nuvEnviar,200)}}
+  else{let c2=null;try{if(localStorage.getItem('bancada_p_'+u))c2=JSON.parse(localStorage.getItem('bancada_'+u))}catch(x){}db=c2&&c2.os?c2:((importar&&$('#limp').checked&&legado)?legado:vazio());NUV.ver=null;db.v=2;await nuvEnviar()}
  }catch(e){let c=null;try{c=JSON.parse(localStorage.getItem('bancada_'+u))}catch(x){}db=c||vazio();nuvStatus('offline')}
- ['os','models','brands','sup','prod','sales'].forEach(k=>db[k]=db[k]||[]);db.n=db.n||1;db.v=db.v||2;return true}
-async function nuvEnviar(){if(!NUV.ses)return;if(NUV.busy){NUV.pend=true;return}NUV.busy=true;NUV.pend=false;
+ const nc=!db.cli;['os','models','brands','sup','prod','sales','cli','lix'].forEach(k=>db[k]=db[k]||[]);if(nc)db.os.slice().reverse().forEach(o=>garantirCliente(o.cli,o.tel));purgarLixeira();db.cfg=db.cfg||{nome:'',logo:''};db.n=db.n||1;db.v=db.v||2;if(nc&&db.os.length)setTimeout(save,300);return true}
+function nuvJuntar(m,b){const J=JSON.stringify;['os','cli','lix','prod','sales','models','brands','sup'].forEach(k=>{b[k]=b[k]||[];m[k]=m[k]||[]});
+ ['models','brands','sup'].forEach(k=>m[k].forEach(x=>{if(!db[k].includes(x))db[k].push(x)}));
+ ['os','cli','lix'].forEach(k=>{const bm=new Map(b[k].map(x=>[x.id,J(x)])),ids=new Set(m[k].map(x=>x.id));
+  m[k].forEach(x=>{const s=bm.get(x.id),i=db[k].findIndex(y=>y.id==x.id);
+   if(s===undefined){if(i<0)db[k].push(x);else if(J(db[k][i])!==J(x)){if(k=='os')x.id=db.n++;db[k].push(x)}}
+   else if(s!==J(x)){if(i>=0)db[k][i]=x;else db[k].push(x)}});
+  b[k].forEach(x=>{if(!ids.has(x.id))db[k]=db[k].filter(y=>y.id!=x.id)})});
+ const bp=new Map(b.prod.map(x=>[x.n.toLowerCase(),x]));
+ m.prod.forEach(x=>{const k=x.n.toLowerCase(),o=bp.get(k),c=db.prod.find(y=>y.n.toLowerCase()==k);if(!c){db.prod.push(x);return}
+  c.q+=x.q-(o?o.q:0);if(!o||o.preco!=x.preco)c.preco=x.preco;if(!o||o.custo!=x.custo)c.custo=x.custo});
+ m.sales.slice(b.sales.length).forEach(x=>db.sales.push(x));
+ db.n=Math.max(db.n||1,m.n||1);if(J(m.cfg)!==J(b.cfg||{nome:'',logo:''}))db.cfg=m.cfg}
+async function nuvEnviar(){if(!NUV.ses)return;if(NUV.busy){NUV.pend=true;return}NUV.busy=true;NUV.pend=false;const snap=JSON.stringify(db);
  const c={dados:db,email:NUV.ses.user.email,atualizado_em:new Date().toISOString()},id=NUV.ses.user.id;
  try{const r=NUV.ver===null?await nuvApi('/rest/v1/lojas_dados',{m:'POST',b:{user_id:id,...c},h:{Prefer:'return=representation'}}):await nuvApi('/rest/v1/lojas_dados?user_id=eq.'+id+'&atualizado_em=eq.'+encodeURIComponent(NUV.ver),{m:'PATCH',b:c,h:{Prefer:'return=representation'}});
-  if(r.ok&&r.j&&r.j.length){NUV.ver=r.j[0].atualizado_em;if(!NUV.pend)try{localStorage.removeItem('bancada_p_'+id)}catch(e){}nuvStatus(NUV.pend?'salvando':'ok')}
-  else if(r.s==409||(r.ok&&r.j&&!r.j.length)){NUV.busy=false;try{localStorage.removeItem('bancada_p_'+id)}catch(e){}msg('Outro aparelho salvou antes. Recarreguei os dados da nuvem; refaça a última alteração se ela não aparecer.');await nuvCarregar();nuvRedesenha();return}
+  if(r.ok&&r.j&&r.j.length){NUV.ver=r.j[0].atualizado_em;NUV.base=snap;if(!NUV.pend)try{localStorage.removeItem('bancada_p_'+id)}catch(e){}nuvStatus(NUV.pend?'salvando':'ok')}
+  else if(r.s==409||(r.ok&&r.j&&!r.j.length)){NUV.busy=false;try{localStorage.removeItem('bancada_p_'+id)}catch(e){}const mine=db,base=NUV.base?JSON.parse(NUV.base):null;if(!(await nuvCarregar()))return;if(base&&NUV.est!='offline'){nuvJuntar(mine,base);save()}msg('Outro aparelho salvou antes. Juntei as suas alterações com as dele.');nuvRedesenha();return}
   else throw r}catch(e){nuvStatus('offline')}
  NUV.busy=false;if(NUV.pend)NUV.tmr=setTimeout(nuvEnviar,300)}
 async function nuvPoll(){if(!NUV.ses||NUV.busy||NUV.pend)return;if(NUV.est=='offline'){nuvEnviar();return}
  try{const r=await nuvApi('/rest/v1/lojas_dados?select=atualizado_em&user_id=eq.'+NUV.ses.user.id);if(r.ok&&r.j.length&&r.j[0].atualizado_em!==NUV.ver)nuvStatus('novo')}catch(e){}}
-async function nuvSair(exp){if(!exp&&NUV.pend){clearTimeout(NUV.tmr);await nuvEnviar()}NUV.ses=null;NUV.ver=null;try{localStorage.removeItem('bancada_sessao')}catch(e){}db=vazio();nuvStatus();$('#lsenha').value='';$('#lmsg').textContent=exp?'Sua sessão expirou. Entre de novo.':'';$('#login').style.display='block'}
+async function nuvSair(exp){if(!exp&&NUV.pend){clearTimeout(NUV.tmr);await nuvEnviar()}NUV.ses=null;NUV.ver=null;try{localStorage.removeItem('bancada_sessao')}catch(e){}db=vazio();nuvStatus();$('#lsenha').value='';$('#lmsg').style.color='';$('#lmsg').textContent=exp?'Sua sessão expirou. Entre de novo.':'';$('#login').style.display='block'}
 async function nuvEntrar(cad){const email=$('#lemail').value.trim(),senha=$('#lsenha').value,m=$('#lmsg');
  if(!email||senha.length<6){m.textContent='Informe o e-mail e uma senha de pelo menos 6 caracteres.';return}
  m.textContent='Aguarde...';
@@ -126,11 +153,11 @@ async function nuvEntrar(cad){const email=$('#lemail').value.trim(),senha=$('#ls
   if(!r.ok){const t=String(j.msg||j.error_description||j.message||'');m.textContent=/invalid login/i.test(t)?'E-mail ou senha incorretos.':/already|registered/i.test(t)?'Este e-mail já tem conta. Use Entrar.':/not confirmed/i.test(t)?'Confirme seu e-mail pelo link que enviamos e depois use Entrar.':t||'Não foi possível entrar.';return}
   if(!j.access_token){m.textContent='Conta criada. Enviamos um e-mail de confirmação: clique no link e depois use Entrar.';return}
   nuvSessao(j);await nuvAbrir(true)}catch(e){m.textContent='Sem conexão com a internet. Tente de novo.'}}
-async function nuvAbrir(importar){if(!(await nuvCarregar(importar)))return;$('#login').style.display='none';$('#lmsg').textContent='';$('#dt').value=hoje();nuvRedesenha();nuvStatus()}
+async function nuvAbrir(importar){if(!(await nuvCarregar(importar)))return;$('#login').style.display='none';$('#lmsg').style.color='';$('#lmsg').textContent='';$('#dt').value=hoje();nuvRedesenha();nuvStatus()}
 $('#lent').onclick=()=>nuvEntrar(false);$('#lcad').onclick=()=>nuvEntrar(true);$('#lsenha').onkeydown=e=>{if(e.key=='Enter')nuvEntrar(false)};
 $('#nuv').onclick=e=>{if(e.target.id=='nuvSair')nuvSair();if(e.target.id=='nuvAtu')nuvAbrir()};
 addEventListener('online',()=>{if(NUV.ses)nuvEnviar()});setInterval(nuvPoll,30000);
-function nuvBoot(){$('#limpl').style.display=legado?'flex':'none';if(NUV.ses)nuvAbrir(false);else $('#login').style.display='block'}
+function nuvBoot(){if(/type=recovery/.test(location.hash)&&/access_token=/.test(location.hash)){recSenha();return}if(/^#g=/.test(location.hash)){mostrarRec();return}$('#limpl').style.display=legado?'flex':'none';if(NUV.ses){$('#login').style.display='block';$('#lmsg').style.color='var(--mut)';$('#lmsg').textContent='Carregando seus dados...';nuvAbrir(false)}else $('#login').style.display='block'}
 
 const R=v=>'R$ '+(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -146,7 +173,7 @@ const parcVals=(cb,n)=>{const b=Math.floor(cb/n*100)/100;return Array.from({leng
 const pend=o=>parcVals(o.cobr,o.pg.n).reduce((a,v,i)=>a+(o.pg.pagas[i]?0:v),0);
 const pgRows=(f,n,v,cb,pg)=>{n=f=='vista'?1:Math.min(24,Math.max(1,(n|0)||1));return parcVals(cb,n).map((val,i)=>`<label style='display:flex;gap:8px;align-items:center;color:var(--ink);margin:0 0 4px'><input type='checkbox' style='width:auto;margin:0' data-pg${pg[i]?' checked':''}>${f=='vista'?'Pago':n==1?'Pagamento único':'Parcela '+(i+1)+'/'+n}: ${R(val)}${v&&f!='vista'?' · vence '+fd(addM(v,i)):''}</label>`).join('')};
 let editId=null;
-const edForm=o=>`<div class='card' data-id='${o.id}' style='border:2px solid var(--pri)'><h2>Editando a O.S. ${o.id}</h2><div class='g'><label>Data de entrada<input type='date' data-f='data' value='${esc(String(o.data).slice(0,10))}'></label><label>Nome do cliente<input data-f='cli' value='${esc(o.cli)}'></label><label>Telefone<input data-f='tel' value='${esc(o.tel)}'></label><label>Marca<input data-f='marca' list='dlMarca' value='${esc(o.marca)}'></label><label>Modelo<input data-f='modelo' list='dlModelo' value='${esc(o.modelo)}'></label><label>IMEI ou série<input data-f='imei' value='${esc(o.imei)}'></label><label>Senha do aparelho<input data-f='senha' value='${esc(o.senha)}'></label><label>Defeito<input data-f='defeito' value='${esc(o.defeito)}'></label></div><h3>Checklist de entrada</h3><div class='ck'>${CK.map((c,i)=>`<div>${c}<select data-e='${i}'>${[['ok','OK'],['avaria','Avaria'],['sem','Sem teste']].map(([k,t])=>`<option value='${k}'${o.ent[i]==k?' selected':''}>${t}</option>`).join('')}</select></div>`).join('')}</div><label style='margin-top:10px'>Observações<textarea data-f='obs' rows='2'>${esc(o.obs)}</textarea></label><h3>Peça e valores</h3><div class='g'><label>Fornecedor<input data-f='sup' list='dlSup' value='${esc(o.sup)}'></label><label style='display:flex;gap:8px;align-items:center;margin-top:22px'><input type='checkbox' data-f='own' style='width:auto;margin:0'${o.own?' checked':''}>Peça própria ou retirada (custo R$ 0,00)</label><label>Custo da peça (R$)<input type='number' min='0' step='0.01' data-f='peca' value='${o.peca}'></label><label>Mão de obra (R$)<input type='number' min='0' step='0.01' data-f='mao' value='${o.mao}'></label><label>Valor cobrado (R$)<input type='number' min='0' step='0.01' data-f='cobr' value='${o.cobr}'></label></div><p style='margin-top:12px'><button class='b' data-edsave='${o.id}'>Salvar alterações</button> <button class='s' data-edcancel='1'>Cancelar</button></p></div>`;
+const edForm=o=>`<div class='card' data-id='${o.id}' style='border:2px solid var(--pri)'><h2>Editando a O.S. ${o.id}</h2><div class='g'><label>Data de entrada<input type='date' data-f='data' value='${esc(String(o.data).slice(0,10))}'></label><label>Nome do cliente<input data-f='cli' value='${esc(o.cli)}'></label><label>Telefone<input data-f='tel' value='${esc(o.tel)}'></label><label>Telefone 2 (opcional)<input data-f='tel2' value='${esc(o.tel2||'')}'></label><label>Marca<input data-f='marca' list='dlMarca' value='${esc(o.marca)}'></label><label>Modelo<input data-f='modelo' list='dlModelo' value='${esc(o.modelo)}'></label><label>IMEI ou série<input data-f='imei' value='${esc(o.imei)}'></label><label>Senha do aparelho<input data-f='senha' value='${esc(o.senha)}'></label><label>Defeito<input data-f='defeito' value='${esc(o.defeito)}'></label></div><h3>Checklist de entrada</h3><div class='ck'>${CK.map((c,i)=>`<div>${c}<select data-e='${i}'>${[['ok','OK'],['avaria','Avaria'],['sem','Sem teste']].map(([k,t])=>`<option value='${k}'${o.ent[i]==k?' selected':''}>${t}</option>`).join('')}</select></div>`).join('')}</div><label style='margin-top:10px'>Observações<textarea data-f='obs' rows='2'>${esc(o.obs)}</textarea></label><h3>Peça e valores</h3><div class='g'><label>Fornecedor<input data-f='sup' list='dlSup' value='${esc(o.sup)}'></label><label style='display:flex;gap:8px;align-items:center;margin-top:22px'><input type='checkbox' data-f='own' style='width:auto;margin:0'${o.own?' checked':''}>Peça própria ou retirada (custo R$ 0,00)</label><label>Custo da peça (R$)<input type='number' min='0' step='0.01' data-f='peca' value='${o.peca}'></label><label>Mão de obra (R$)<input type='number' min='0' step='0.01' data-f='mao' value='${o.mao}'></label><label>Valor cobrado (R$)<input type='number' min='0' step='0.01' data-f='cobr' value='${o.cobr}'></label></div><p style='margin-top:12px'><button class='b' data-edsave='${o.id}'>Salvar alterações</button> <button class='s' data-edcancel='1'>Cancelar</button></p></div>`;
 const bn=()=>{const a=db.os.filter(o=>o.st==0&&dias(o.stData||o.data)>=1).length,b=db.os.filter(o=>o.st==4&&dias(o.stData||o.data)>=90).length,m=[];if(a)m.push(a+' O.S. sem aprovação há mais de 1 dia');if(b)m.push(b+' O.S. pronta(s) há mais de 3 meses sem entrega: entre em contato com o cliente');return m.length?`<div class='card late'><div class='alr'>⚠ ${m.join('<br>⚠ ')}</div></div>`:''};
 $('#ckEnt').innerHTML=CK.map((c,i)=>`<div>${c}<select data-i="${i}"><option value="ok">OK</option><option value="avaria">Avaria</option><option value="sem">Sem teste</option></select></div>`).join('');
 function lists(){$('#dlMarca').innerHTML=db.brands.map(x=>`<option value="${esc(x)}">`).join('');$('#dlModelo').innerHTML=db.models.map(x=>`<option value="${esc(x)}">`).join('');$('#dlSup').innerHTML=db.sup.map(x=>`<option value="${esc(x)}">`).join('')}
@@ -167,26 +194,27 @@ if(cb>0){if(l<0)a.push('Lucro negativo ('+R(l)+').');else if(l/cb<0.1)a.push('Ma
 return{e,a}}
 function liveAv(){const r=checkOS(true),m=r.e.filter(x=>x[0]!='cli'&&x[0]!='modelo').map(x=>x[1]).concat(r.a),b=$('#avOS');b.innerHTML=m.map(x=>'⚠ '+x).join('<br>');b.style.display=m.length?'block':'none'}
 $$('#nova input,#nova textarea').forEach(i=>i.addEventListener('input',()=>{i.classList.remove('inv');liveAv()}));
-const profit=o=>o.cobr-((o.own?0:o.peca)+o.mao);
+const ocSum=(o,t)=>(o.oc||[]).filter(x=>x.tipo==t).reduce((a,x)=>a+x.valor,0);
+const profit=o=>o.cobr-((o.own?0:o.peca)+o.mao)-ocSum(o,'prejuizo')-ocSum(o,'devolucao');
 $('#salvar').onclick=()=>{
  const chk=checkOS(false);$$('.inv').forEach(x=>x.classList.remove('inv'));if(chk.e.length){chk.e.forEach(([i])=>$('#'+i).classList.add('inv'));return alert('Corrija: '+chk.e.map(x=>x[1]).join(' '))}
  if(chk.a.length&&!ok1('Atenção: '+chk.a.join(' ')))return;
- const o={id:db.n,data:$('#dt').value,cli:$('#cli').value.trim(),tel:$('#tel').value,marca:$('#marca').value.trim(),modelo:$('#modelo').value.trim(),imei:$('#imei').value.trim(),senha:$('#senha').value,defeito:$('#defeito').value.trim(),obs:$('#obs').value,
+ const o={id:db.n,data:$('#dt').value,cli:$('#cli').value.trim(),tel:$('#tel').value,tel2:$('#tel2').value.trim(),marca:$('#marca').value.trim(),modelo:$('#modelo').value.trim(),imei:$('#imei').value.trim(),senha:$('#senha').value,defeito:$('#defeito').value.trim(),obs:$('#obs').value,
  ent:$$('#ckEnt select').map(s=>s.value),sai:CK.map(()=>false),sup:$('#sup').value.trim(),own:$('#own').checked,peca:num('peca'),mao:num('mao'),cobr:num('cobr'),st:0,stData:$('#dt').value,pg:{forma:'vista',n:1,venc:'',pagas:[$('#pg').value=='sim']}};
  
  learn(db.models,o.modelo);learn(db.brands,o.marca);if(!o.own)learn(db.sup,o.sup);
- okd.clear();o.id=db.n++;db.os.unshift(o);save();lists();
+ okd.clear();o.id=db.n++;const fp=fotosPend.slice();fotosPend=[];drawFotoPrev();db.os.unshift(o);garantirCliente(o.cli,o.tel,$('#nasc').value);save();lists();if(fp.length)subirFotos(o,fp);
  $$('#nova input,#nova textarea').forEach(i=>i.type=='checkbox'?i.checked=false:i.value='');$$('#ckEnt select').forEach(s=>s.value='ok');$('#pg').value='nao';$('#dt').value=hoje();calc();liveAv();
  alert('O.S. nº '+o.id+' salva.');$('#nav button[data-t=lista]').click()};
 function drawOS(){const L=$('#osList'),al=db.os.filter(o=>(o.st==0&&dias(o.stData||o.data)>=1)||(o.st==4&&dias(o.stData||o.data)>=90)).length;$('#nav button[data-t=lista]').textContent='Ordens de serviço'+(al?' ⚠ '+al:'');if(!db.os.length){L.innerHTML='<div class="empty">Nenhuma O.S. ainda. Crie a primeira em Nova O.S.</div>';return}
 L.innerHTML=bn()+[...db.os].sort((a,b)=>b.data.localeCompare(a.data)||b.id-a.id).map(o=>{if(o.id===editId)return edForm(o);const l=profit(o),av=CK.filter((c,i)=>o.ent[i]=='avaria'),sem=CK.filter((c,i)=>o.ent[i]=='sem'),ds=dias(o.stData||o.data),late1=o.st==0&&ds>=1,late3=o.st==4&&ds>=90,pe=pend(o),pt=!o.cobr?'Sem valor':pe<0.005?'Pago':pe<o.cobr-0.005?'Parcial':'Não pago';
-return `<div class="card${late1||late3?' late':''}" data-id="${o.id}"><div class="row"><b>O.S. ${o.id}: ${esc(o.cli)}</b><span><span class="tag${late1?' lt':''}"><b>${ST[o.st]}</b></span> <span class="tag"><b>${pt}</b></span></span></div>${late1?`<div class="alr">⚠ Sem aprovação há ${ds} dia(s). Entre em contato com o cliente${o.tel?' ('+esc(o.tel)+')':''} para aprovar o orçamento.</div>`:''}${late3?`<div class="alr">⚠ Pronto há ${ds} dias sem ser entregue. Entre em contato com o cliente${o.tel?' ('+esc(o.tel)+')':''} para retirar o aparelho.</div>`:''}
+return `<div class="card${late1||late3?' late':''}" data-id="${o.id}"><div class="row"><b>O.S. ${o.id}: ${esc(o.cli)}</b><span><span class="tag${late1?' lt':''}"><b>${ST[o.st]}</b></span> <span class="tag"><b>${pt}</b></span></span></div>${late1?`<div class="alr">⚠ Sem aprovação há ${ds} dia(s). Entre em contato com o cliente${telTxt(o)?' ('+esc(telTxt(o))+')':''} para aprovar o orçamento.</div>`:''}${late3?`<div class="alr">⚠ Pronto há ${ds} dias sem ser entregue. Entre em contato com o cliente${telTxt(o)?' ('+esc(telTxt(o))+')':''} para retirar o aparelho.</div>`:''}
 <div>${esc(o.marca)} ${esc(o.modelo)} · ${esc(o.defeito)||'sem defeito informado'}</div>
-<div style="color:var(--mut);font-size:14px">Entrada em ${fd(o.data)} · ${esc(o.tel)} · IMEI ${esc(o.imei)||'não informado'} · senha ${esc(o.senha)||'não informada'}</div>
+<div style="color:var(--mut);font-size:14px">Entrada em ${fd(o.data)} · ${esc(telTxt(o))} · IMEI ${esc(o.imei)||'não informado'} · senha ${esc(o.senha)||'não informada'}</div>
 ${sem.length?`<div class="warn">Sem teste na entrada: ${sem.join(', ')}</div>`:''}${av.length?`<div class="warn">Avarias na entrada: ${av.join(', ')}${o.obs?'. '+esc(o.obs):''}</div>`:o.obs?`<div class="warn">${esc(o.obs)}</div>`:''}
 <div>Cobrado ${R(o.cobr)} · Peça ${o.own?'própria':R(o.peca)}${o.sup?' ('+esc(o.sup)+')':''} · Mão de obra ${R(o.mao)} · <b class="${l<0?'neg':'pos'}">Lucro ${R(l)}${o.cobr?' ('+(l/o.cobr*100).toFixed(1).replace('.',',')+'%)':''}</b></div>
 <details><summary class="s">Atualizar status e checklist de saída (${o.sai.filter(Boolean).length}/${CK.length} testados)</summary><label style="margin-top:8px">Status da O.S.<select data-st style="width:auto">${ST.map((s,i)=>`<option value="${i}"${i==o.st?' selected':''}>${s}</option>`).join('')}</select></label><h3>Pagamento (total ${R(o.cobr)})</h3><div class="g"><label>Forma<select data-pf>${[['vista','À vista'],['parcelado','Parcelado'],['promissoria','Promissória']].map(([k,t])=>`<option value="${k}"${o.pg.forma==k?' selected':''}>${t}</option>`).join('')}</select></label><label data-pxl style="display:${o.pg.forma=='vista'?'none':'block'}">Nº de parcelas<input type="number" data-pn min="1" max="24" value="${o.pg.forma=='vista'?2:o.pg.n}"></label><label data-pxl style="display:${o.pg.forma=='vista'?'none':'block'}">Vencimento da 1ª parcela<input type="date" data-pv value="${o.pg.venc||''}"></label></div><div data-pbox style="margin-top:6px">${pgRows(o.pg.forma,o.pg.n,o.pg.venc,o.cobr,o.pg.pagas)}</div><h3>Checklist de saída</h3><div class="ck">${CK.map((c,i)=>`<div><label style="display:flex;gap:8px;align-items:center;color:var(--ink);margin:0"><input type="checkbox" style="width:auto;margin:0" data-sai="${o.id}:${i}"${o.sai[i]?' checked':''}>${c}</label></div>`).join('')}</div><p style="margin:10px 0 0"><button class="b" data-ok="${o.id}">OK, salvar</button></p></details>
-<p style="margin:8px 0 0"><button class="s" data-ed="${o.id}">Editar O.S.</button> <button class="s" data-del="${o.id}">Excluir</button></p></div>`}).join('')}
+${acessHTML(o)}${ocHTML(o)}<p style="margin:8px 0 0"><button class="s" data-ft="${o.id}">Fotos (${(o.fotos||[]).length})</button> <button class="s" data-oc="${o.id}">Retorno / prejuízo</button> <button class="s" data-va="${o.id}">Vender acessório</button> <button class="s" data-wg="${o.id}">Garantia (WhatsApp)</button> <button class="s" data-pr="${o.id}">Imprimir</button> <button class="s" data-ed="${o.id}">Editar O.S.</button> <button class="s" data-del="${o.id}">Excluir</button></p></div>`}).join('')}
 $('#osList').addEventListener('click',e=>{const t=e.target;if(t.dataset.ok){const o=db.os.find(o=>o.id==t.dataset.ok),c=t.closest('.card');const f=c.querySelector('[data-pf]').value,n=f=='vista'?1:Math.min(24,Math.max(1,+c.querySelector('[data-pn]').value||1)),v=c.querySelector('[data-pv]').value;if(f!='vista'&&!v){msg('Informe o vencimento da 1ª parcela.');return}const pagas=[...c.querySelectorAll('[data-pg]')].map(x=>x.checked);while(pagas.length<n)pagas.push(false);pagas.length=n;const ns=+c.querySelector('[data-st]').value;if(ns!=o.st)o.stData=hoje();o.st=ns;o.sai=[...c.querySelectorAll('[data-sai]')].map(x=>x.checked);o.pg={forma:f,n,venc:v,pagas};save();drawOS();drawRel();const w=[];if(o.st>=4){const f=o.sai.filter(Boolean).length;if(f<CK.length)w.push('checklist de saída incompleto ('+f+'/'+CK.length+')');if(!o.cobr)w.push('valor cobrado zerado')}if(o.st==5){const q=pend(o);if(q>0.004)w.push('pagamento pendente de '+R(q))}msg(w.length?'Salvo. Atenção: '+w.join(' e ')+'.':'O.S. '+o.id+' atualizada.')}
  
  });
@@ -199,10 +227,10 @@ if(!v('cli')||!v('modelo')||!g('data').value)return msg('Preencha a data, o nome
 if(nv('peca')<0||nv('mao')<0||nv('cobr')<0)return msg('Os valores não podem ser negativos.');
 const lu=nv('cobr')-((own?0:nv('peca'))+nv('mao'));if(lu<0&&!ok1('Lucro negativo ('+R(lu)+').'))return;
 const nd=g('data').value;if(o.stData==o.data)o.stData=nd;
-Object.assign(o,{data:nd,cli:v('cli'),tel:v('tel'),marca:v('marca'),modelo:v('modelo'),imei:v('imei'),senha:v('senha'),defeito:v('defeito'),obs:g('obs').value,sup:v('sup'),own,peca:nv('peca'),mao:nv('mao'),cobr:nv('cobr'),ent:CK.map((c,i)=>cd.querySelector('[data-e="'+i+'"]').value)});
-learn(db.models,o.modelo);learn(db.brands,o.marca);if(!own)learn(db.sup,o.sup);editId=null;save();lists();drawOS();msg('O.S. '+o.id+' atualizada.')}
+Object.assign(o,{data:nd,cli:v('cli'),tel:v('tel'),tel2:v('tel2'),marca:v('marca'),modelo:v('modelo'),imei:v('imei'),senha:v('senha'),defeito:v('defeito'),obs:g('obs').value,sup:v('sup'),own,peca:nv('peca'),mao:nv('mao'),cobr:nv('cobr'),ent:CK.map((c,i)=>cd.querySelector('[data-e="'+i+'"]').value)});
+learn(db.models,o.modelo);learn(db.brands,o.marca);if(!own)learn(db.sup,o.sup);garantirCliente(o.cli,o.tel);editId=null;save();lists();drawOS();msg('O.S. '+o.id+' atualizada.')}
 });
-$('#osList').addEventListener('click',e=>{const d=e.target.dataset.del;if(d&&ok1('Excluir a O.S. '+d+'?')){db.os=db.os.filter(o=>o.id!=d);save();drawOS()}});
+$('#osList').addEventListener('click',e=>{const d=e.target.dataset.del;if(d&&ok1('Excluir a O.S. '+d+'?')){const x=db.os.find(o=>o.id==d);if(x)paraLixeira('os',x);db.os=db.os.filter(o=>o.id!=d);save();drawOS();drawLix();msg('O.S. '+d+' enviada para a Lixeira (fica 7 dias).')}});
 $('#addProd').onclick=()=>{const n=$('#pn').value.trim();if(!n)return alert('Informe o nome do produto.');if(num('pp')<=0)return alert('Informe um preço de venda maior que zero.');if(num('pc')<0||num('pq')<1||num('pq')%1)return alert('O custo não pode ser negativo e a quantidade deve ser um número inteiro de 1 ou mais.');if(num('pp')<num('pc')&&!ok1('Preço de venda menor que o custo: vai dar prejuízo.'))return;
  let p=db.prod.find(x=>x.n.toLowerCase()==n.toLowerCase());if(!p){p={n,preco:0,custo:0,q:0};db.prod.push(p)}
  p.preco=num('pp');p.custo=num('pc');p.q+=Math.max(1,num('pq'));save();['pn','pp','pc'].forEach(i=>$('#'+i).value='');$('#pq').value=1;drawPDV()};
@@ -224,16 +252,18 @@ function drawRel(){const p=$('#per').value,h=hoje(),d=new Date();let ini='0000-0
  else if(p=='c'){ini=$('#de').value||'0000-00-00';fim=$('#ate').value||'9999-99-99';if(ini>fim){[ini,fim]=[fim,ini];msg('A data inicial era depois da final. Invertemos as datas.')}}
  const inP=x=>{x=String(x).slice(0,10);return x>=ini&&x<=fim};
  const os=db.os.filter(o=>inP(o.data)),sv=db.sales.filter(s=>inP(s.data)),ok=os.filter(o=>o.st>=4);
- const v=$('#vis').value,fs=os.reduce((a,o)=>a+parcVals(o.cobr,o.pg.n).reduce((s,x,i)=>s+(o.pg.pagas[i]?x:0),0),0),aRec=os.filter(o=>o.st>=4).reduce((a,o)=>a+pend(o),0),fa=sv.reduce((a,s)=>a+s.preco*s.q,0),cs=os.filter(o=>o.st>=2).reduce((a,o)=>a+(o.own?0:o.peca),0)+ok.reduce((a,o)=>a+o.mao,0),ca=sv.reduce((a,s)=>a+s.custo*s.q,0),fat=(v!='a'?fs:0)+(v!='s'?fa:0),cus=(v!='a'?cs:0)+(v!='s'?ca:0),lu=fat-cus;
+ const v=$('#vis').value,fs=os.reduce((a,o)=>a+parcVals(o.cobr,o.pg.n).reduce((s,x,i)=>s+(o.pg.pagas[i]?x:0),0),0),dvT=os.reduce((a,o)=>a+ocSum(o,'devolucao'),0),pjT=os.reduce((a,o)=>a+ocSum(o,'prejuizo'),0),aRec=os.filter(o=>o.st>=4).reduce((a,o)=>a+pend(o),0),fa=sv.reduce((a,s)=>a+s.preco*s.q,0),cs=os.filter(o=>o.st>=2).reduce((a,o)=>a+(o.own?0:o.peca),0)+ok.reduce((a,o)=>a+o.mao,0),ca=sv.reduce((a,s)=>a+s.custo*s.q,0),fat=(v!='a'?fs-dvT:0)+(v!='s'?fa:0),cus=(v!='a'?cs+pjT:0)+(v!='s'?ca:0),lu=fat-cus;
  const mod={},def={},sup={};os.forEach(o=>{mod[o.modelo]=(mod[o.modelo]||0)+1;const k=o.modelo+' - '+(o.defeito||'sem defeito').toLowerCase();def[k]=(def[k]||0)+1;if(o.sup&&!o.own&&o.st>=2){sup[o.sup]=sup[o.sup]||[0,0];sup[o.sup][0]++;sup[o.sup][1]+=o.peca}});
  const ac={};sv.forEach(s=>{const a=ac[s.n]=ac[s.n]||[0,0,0];a[0]+=s.q;a[1]+=s.preco*s.q;a[2]+=(s.preco-s.custo)*s.q});
  const rc=os.filter(o=>o.cobr>0).map(o=>({o,...parcInfo(o)})).filter(x=>x.pd>0.004).sort((a,b)=>b.vc-a.vc||b.pd-a.pd),tp=rc.reduce((a,x)=>a+x.pd,0),tv=rc.reduce((a,x)=>a+x.vc,0);
  const recCard=`<div class="card"><h2>A receber</h2><div class="res"><span>Pendente: ${R(tp)}</span><span class="${tv>0?'neg':''}">Vencido: ${R(tv)}</span></div>${tbl(['Nº','Cliente','Status','Pendente','Vencido','Próximo vencimento'],rc.map(x=>[x.o.id,esc(x.o.cli),ST[x.o.st],R(x.pd),x.vc?`<span class="neg">${R(x.vc)}</span>`:'—',x.px?fd(x.px):'—']))}</div>`;
  const acRank=`<div class="card"><h2>Acessórios que mais saem</h2>${tbl(['Produto','Qtd vendida','Faturamento','Lucro','Margem'],Object.entries(ac).sort((a,b)=>b[1][0]-a[1][0]).slice(0,10).map(([k,x])=>[esc(k),x[0],R(x[1]),R(x[2]),mg(x[2],x[1])]))}</div>`;
  const acCard=`${acRank}<div class="card"><h2>Vendas de acessórios</h2>${tbl(['Data','Produto','Qtd','Valor','Lucro'],sv.map(s=>[fd(s.data),esc(s.n),s.q,R(s.preco*s.q),R((s.preco-s.custo)*s.q)]))}</div>`;
+ const oc=v=='a'?[]:os.flatMap(o=>(o.oc||[]).map(x=>({o,...x}))).sort((a,b)=>b.data.localeCompare(a.data));
+ const ocCard=oc.length?`<div class="card"><h2>Retornos, prejuízos e devoluções</h2><div class="res"><span>Prejuízos: ${R(pjT)}</span><span>Devoluções: ${R(dvT)}</span><span>Retornos: ${oc.filter(x=>x.tipo=='retorno').length}</span></div><p style="color:var(--mut);margin:6px 0">Prejuízos entram nos Gastos e devoluções saem do Recebido.</p>${tbl(['Data','O.S.','Cliente','Tipo','Valor','Observação'],oc.map(x=>[fd(x.data),x.o.id,esc(x.o.cli),TN[x.tipo],x.tipo=='retorno'?'—':R(x.valor),esc(x.obs||'')]))}</div>`:'';
  const stCard=`<div class="card"><h2>O.S. por status</h2><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">${ST.map((s,i)=>`<span class="tag">${s}: <b>${os.filter(o=>o.st==i).length}</b></span>`).join('')}</div>${ST.map((s,i)=>{const L=os.filter(o=>o.st==i).sort((a,b)=>b.data.localeCompare(a.data));return L.length?`<details><summary>${s} (${L.length})</summary>${tbl(['Nº','Data','Cliente','Aparelho','Defeito','Cobrado','Lucro'],L.map(o=>[o.id,fd(o.data),esc(o.cli),esc(o.marca+' '+o.modelo),esc(o.defeito),R(o.cobr),R(profit(o))]))}</details>`:''}).join('')}</div>`;
  $('#relOut').innerHTML=`<div class="card"><h2>Financeiro: ${{t:'serviços e acessórios',s:'serviços',a:'acessórios'}[v]}</h2><p style="color:var(--mut);margin:0 0 8px">Dinheiro que já entrou (parcelas pagas das O.S. e vendas de acessórios) menos o que já foi gasto. A peça vira gasto quando a O.S. vai para Aguardando peça e a mão de obra quando fica Pronto ou Entregue, mesmo que o cliente ainda não tenha pago. O que o cliente ainda deve por serviços já feitos aparece em A receber.</p><div class="res"><span>Recebido: ${R(fat)}</span><span>Gastos: ${R(cus)}</span><span class="${lu<0?'neg':'pos'}">Lucro em caixa: ${R(lu)}</span></div>${v!='a'?`<div class="res" style="margin-top:8px"><span class="${aRec>0?'neg':''}">A receber de serviços já feitos: ${R(aRec)}</span><span>Lucro quando receber tudo: ${R(lu+aRec)}</span></div>`:''}</div>
- ${recCard}${stCard}<div class="card"><h2>Modelos que mais entram</h2>${tbl(['Modelo','Entradas'],rank(mod).map(([k,v])=>[esc(k),v]))}</div>
+ ${recCard}${ocCard}${stCard}<div class="card"><h2>Modelos que mais entram</h2>${tbl(['Modelo','Entradas'],rank(mod).map(([k,v])=>[esc(k),v]))}</div>
  <div class="card"><h2>Defeitos mais recorrentes por modelo</h2>${tbl(['Modelo e defeito','Vezes'],rank(def).map(([k,v])=>[esc(k),v]))}</div>
  <div class="card"><h2>Fornecedores de peças</h2>${tbl(['Fornecedor','Peças','Total gasto'],Object.entries(sup).sort((a,b)=>b[1][0]-a[1][0]).map(([k,v])=>[esc(k),v[0],R(v[1])]))}</div>`;
  if(v=='a'){$$('#relOut .card').forEach((c,i)=>{if(i)c.remove()});$('#relOut').insertAdjacentHTML('beforeend',acCard)}}
@@ -250,7 +280,140 @@ function drawProj(){const h=hoje(),it0=[];db.os.forEach(o=>{if(!o.cobr)return;pa
  <div class="card"><h2>Previsão por mês</h2>${tbl(['Mês','Parcelas','Valor previsto',''],ms.map(([k,v])=>[k.slice(5)+'/'+k.slice(0,4),v[0],R(v[1]),`<div style="background:var(--pri);height:10px;border-radius:4px;width:${Math.max(2,v[1]/mx*160)}px"></div>`]))}</div>
  <div class="card"><h2>Vencidas (atrasadas)</h2>${tbl(H,vc.map(row))}</div><div class="card"><h2>A vencer</h2>${tbl(H,fu.map(row))}</div>
  <div class="card"><h2>Sem data de vencimento</h2><p style="color:var(--mut);margin:0 0 8px">${p!='all'?'Sem vencimento, não entra quando há filtro de datas. Escolha Tudo para ver.':'À vista ainda não pago: entra quando o cliente pagar.'}</p>${tbl(H,sm.map(row))}</div>`}
-function draw(){drawOS();drawPDV();drawRel();drawProj()}
+/* ===== Clientes e Lixeira ===== */
+const digs=s=>String(s||'').replace(/\D/g,'');
+const ckey=(n,t)=>digs(t).length>=8?'t'+digs(t).slice(-8):'n'+String(n||'').trim().toLowerCase();
+const novoId=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+function garantirCliente(nome,tel,nasc){nome=String(nome||'').trim();if(!nome)return;const k=ckey(nome,tel),c=db.cli.find(c=>ckey(c.nome,c.tel)==k);if(!c)db.cli.push({id:novoId('c'),nome,tel:String(tel||'').trim(),nasc:nasc||'',obs:'',criado:hoje()});else if(nasc)c.nasc=nasc}
+const osDe=c=>{const k=ckey(c.nome,c.tel);return db.os.filter(o=>ckey(o.cli,o.tel)==k)};
+function purgarLixeira(){const n=db.lix.length,old=x=>Date.now()-Date.parse(x.em)>=7*864e5;db.lix.filter(x=>old(x)&&x.tipo=='os'&&x.item.fotos&&x.item.fotos.length).forEach(x=>apagarFotos(x.item));db.lix=db.lix.filter(x=>!old(x));return n!=db.lix.length}
+function paraLixeira(tipo,item){db.lix.push({id:novoId('l'),tipo,item,em:new Date().toISOString()})}
+const wa=t=>{const d=digs(t);return d.length==10||d.length==11?'https://wa.me/55'+d:''};
+let cliQ='',cliAbre=null,cliEd=null;
+function formCli(){const c=cliEd=='novo'?{nome:'',tel:'',obs:''}:(db.cli.find(x=>x.id==cliEd)||{nome:'',tel:'',obs:''});
+ return `<div class="card"><h2>${cliEd=='novo'?'Novo cliente':'Editar cliente'}</h2><div class="g"><label>Nome<input id="cfNome" value="${esc(c.nome)}"></label><label>Telefone<input id="cfTel" value="${esc(c.tel)}"></label><label>Data de nascimento<input id="cfNasc" type="date" value="${esc(c.nasc||'')}"></label></div><label style="display:block;margin-top:8px">Observações<textarea id="cfObs">${esc(c.obs)}</textarea></label><p style="margin:10px 0 0"><button class="b" data-cs="1">Salvar cliente</button> <button class="s" data-cc="1">Cancelar</button></p></div>`}
+function drawCli(){$('#dlCli').innerHTML=db.cli.map(c=>`<option value="${esc(c.nome)}">`).join('');
+ const q=cliQ.trim().toLowerCase(),qd=digs(cliQ),L=db.cli.filter(c=>!q||c.nome.toLowerCase().includes(q)||(qd&&digs(c.tel).includes(qd))).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+ $('#cliForm').innerHTML=cliEd?formCli():'';
+ const prox=db.cli.map(c=>({c,i:anivInfo(c)})).filter(x=>x.i&&x.i.dias>=1&&x.i.dias<=7).sort((a,b)=>a.i.dias-b.i.dias);
+ $('#cliOut').innerHTML=(prox.length?`<div class="card"><b>🎂 Próximos aniversários (7 dias)</b>${prox.map(x=>`<div>${esc(x.c.nome)} · ${x.c.nasc.slice(8,10)}/${x.c.nasc.slice(5,7)} · em ${x.i.dias} dia(s) · ${x.i.idade} anos</div>`).join('')}</div>`:'')+`<div class="card"><b>${L.length}</b> cliente(s) ${q?'encontrado(s)':'cadastrado(s)'}.</div>`+(L.map(c=>{const os=osDe(c),tot=os.reduce((a,o)=>a+o.cobr,0),ult=os.map(o=>o.data).sort().pop(),w=wa(c.tel);
+  return `<div class="card"><b>${esc(c.nome)}</b> ${c.tel?'· '+esc(c.tel):'· <span style="color:var(--mut)">sem telefone</span>'}${w?` · <a href="${w}" target="_blank" rel="noopener">WhatsApp</a>`:''}
+  <div style="margin-top:4px;color:var(--mut)">${os.length} O.S. · ${R(tot)} em serviços${ult?' · última entrada '+fd(ult):''}</div>${c.nasc?`<div style="margin-top:4px;color:var(--mut)">🎂 ${c.nasc.slice(8,10)}/${c.nasc.slice(5,7)}${anivInfo(c)&&anivInfo(c).dias==0?' · <b>aniversário hoje!</b>':''}</div>`:''}${c.obs?`<div style="margin-top:4px">Obs.: ${esc(c.obs)}</div>`:''}
+  <p style="margin:10px 0 0"><button class="s" data-cv="${c.id}">${cliAbre==c.id?'Esconder O.S.':'Ver O.S.'}</button> <button class="s" data-ce="${c.id}">Editar</button> <button class="s" data-cd="${c.id}">Excluir</button></p>
+  ${cliAbre==c.id?tbl(['Nº','Data','Aparelho','Defeito','Status','Valor'],os.map(o=>[o.id,fd(o.data),esc(o.marca+' '+o.modelo),esc(o.defeito),ST[o.st],R(o.cobr)])):''}</div>`}).join('')||'<div class="card empty">Nenhum cliente.</div>')}
+function salvarCli(){const nome=$('#cfNome').value.trim(),tel=$('#cfTel').value.trim(),obs=$('#cfObs').value,nasc=$('#cfNasc').value;if(!nome)return msg('Informe o nome do cliente.');
+ const k=ckey(nome,tel),c=cliEd=='novo'?null:db.cli.find(x=>x.id==cliEd);
+ if(db.cli.some(x=>x!==c&&ckey(x.nome,x.tel)==k))return msg('Já existe um cliente com esse nome ou telefone.');
+ if(c){const ant=osDe(c);c.nome=nome;c.tel=tel;c.obs=obs;c.nasc=nasc;ant.forEach(o=>{o.cli=nome;o.tel=tel})}else db.cli.push({id:novoId('c'),nome,tel,nasc,obs,criado:hoje()});
+ cliEd=null;save();draw();msg('Cliente salvo.')}
+function drawLix(){if(purgarLixeira())save();const L=[...db.lix].sort((a,b)=>b.em.localeCompare(a.em));
+ $('#lixOut').innerHTML=`<div class="card"><h2>Lixeira</h2><p style="margin:0;color:var(--mut)">O que você exclui fica aqui por 7 dias e depois some de vez. A limpeza acontece quando o sistema é aberto.</p></div>`+(L.map(x=>{const rest=Math.max(1,Math.ceil((7*864e5-(Date.now()-Date.parse(x.em)))/864e5)),
+  t=x.tipo=='os'?`O.S. nº ${x.item.id} · ${esc(x.item.cli)} · ${esc((x.item.marca||'')+' '+(x.item.modelo||''))} · ${R(x.item.cobr)}`:`Cliente: ${esc(x.item.nome)} ${x.item.tel?'· '+esc(x.item.tel):''}`;
+  return `<div class="card"><b>${t}</b><div style="color:var(--mut);margin-top:4px">Excluído em ${new Date(x.em).toLocaleString('pt-BR')} · some em ${rest} dia(s)</div><p style="margin:10px 0 0"><button class="b" data-lr="${x.id}">Restaurar</button> <button class="s" data-lx="${x.id}">Apagar de vez</button></p></div>`}).join('')||'<div class="card empty">A lixeira está vazia.</div>')}
+$('#clientes').addEventListener('click',e=>{const d=e.target.dataset;
+ if(d.cv){cliAbre=cliAbre==d.cv?null:d.cv;drawCli()}else if(d.ce){cliEd=d.ce;drawCli();$('#cfNome').focus()}else if(d.cn){cliEd='novo';drawCli();$('#cfNome').focus()}
+ else if(d.cs)salvarCli();else if(d.cc){cliEd=null;drawCli()}
+ else if(d.cd){const c=db.cli.find(x=>x.id==d.cd);if(c&&ok1('Excluir o cliente '+c.nome+'? Ele vai para a Lixeira.')){paraLixeira('cliente',c);db.cli=db.cli.filter(x=>x!==c);save();drawCli();drawLix();msg('Cliente enviado para a Lixeira (fica 7 dias).')}}});
+$('#cliBusca').oninput=e=>{cliQ=e.target.value;drawCli()};
+$('#lixeira').addEventListener('click',e=>{const d=e.target.dataset,x=db.lix.find(i=>i.id==(d.lr||d.lx));if(!x)return;
+ if(d.lr){if(x.tipo=='os'){if(db.os.some(o=>o.id==x.item.id))return msg('Já existe uma O.S. com esse número.');db.os.unshift(x.item)}
+  else{if(db.cli.some(c=>ckey(c.nome,c.tel)==ckey(x.item.nome,x.item.tel)))return msg('Já existe um cliente igual a esse.');db.cli.push(x.item)}
+  db.lix=db.lix.filter(i=>i!==x);save();draw();msg('Restaurado.')}
+ else if(d.lx&&ok1('Apagar de vez? Não dá para desfazer.')){if(x.tipo=='os')apagarFotos(x.item);db.lix=db.lix.filter(i=>i!==x);save();drawLix();msg('Apagado de vez.')}});
+$('#cli').setAttribute('list','dlCli');$('#cli').addEventListener('change',()=>{const c=db.cli.find(x=>x.nome.toLowerCase()==$('#cli').value.trim().toLowerCase());if(c&&c.tel&&!$('#tel').value)$('#tel').value=c.tel;if(c&&c.nasc&&!$('#nasc').value)$('#nasc').value=c.nasc});
+const logoOk=c=>/^data:image\/(png|jpeg);base64,/.test((c&&c.logo)||'');
+const cabLoja=()=>{const c=db.cfg||{};return(logoOk(c)?`<img src="${c.logo}" style="max-height:60px;max-width:220px;display:block;margin-bottom:4px">`:'')+(c.nome?`<div style="font-weight:bold;font-size:15px">${esc(c.nome)}</div>`:'')};
+function aplicarLoja(){const c=db.cfg||{},ok=logoOk(c),nm=c.nome||'Bancada: assistência técnica';$('#logoTop').style.display=ok?'inline-block':'none';if(ok)$('#logoTop').src=c.logo;
+ $('#nomeTop').textContent=nm;document.title=nm;if(document.activeElement!==$('#lojaNome'))$('#lojaNome').value=c.nome||'';$('#lojaPrev').style.display=ok?'block':'none';if(ok)$('#lojaPrev').src=c.logo;$('#lojaRem').style.display=ok?'inline-block':'none';if(document.activeElement!==$('#lojaTel'))$('#lojaTel').value=c.tel||''}
+$('#lojaTel').onchange=e=>{db.cfg.tel=e.target.value.trim();save();msg('Telefone da loja salvo.')};
+$('#lojaNome').onchange=e=>{db.cfg.nome=e.target.value.trim();save();aplicarLoja();msg('Nome da loja salvo.')};
+$('#lojaRem').onclick=()=>{db.cfg.logo='';save();aplicarLoja();msg('Logo removida.')};
+$('#lojaLogo').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;if(!/^image\/(png|jpeg)$/.test(f.type))return msg('Use uma imagem PNG ou JPG.');
+ const r=new FileReader();r.onload=()=>{const im=new Image();im.onerror=()=>msg('Não consegui ler essa imagem.');im.onload=()=>{const sc=Math.min(1,300/im.width,150/im.height),w=Math.max(1,Math.round(im.width*sc)),h=Math.max(1,Math.round(im.height*sc)),cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d');let d='';
+  if(f.type=='image/png'){x.drawImage(im,0,0,w,h);d=cv.toDataURL('image/png')}
+  if(!d||d.length>150000){x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);d=cv.toDataURL('image/jpeg',.85)}
+  db.cfg.logo=d;save();aplicarLoja();msg('Logo salva.')};im.src=r.result};r.readAsDataURL(f)};
+const acessDe=o=>db.sales.filter(v=>String(v.os)==String(o.id));
+const acessTxt=l=>l.map(v=>`${esc(v.n)} ×${v.q} (${R(v.preco*v.q)})`).join(', ');
+const acessTot=l=>l.reduce((a,v)=>a+v.preco*v.q,0);
+const acessHTML=o=>{const l=acessDe(o);return l.length?`<div style="margin-top:6px"><b>Acessórios vendidos nesta O.S.:</b> ${acessTxt(l)} · Total ${R(acessTot(l))} · Atendimento completo ${R(o.cobr+acessTot(l))}</div>`:''};
+/* ===== Comprovante de garantia por link ===== */
+const b64e=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const b64d=h=>JSON.parse(decodeURIComponent(escape(atob(h.replace(/-/g,'+').replace(/_/g,'/')))));
+const addDias=(s,n)=>{const d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+function linkGarantia(o){const c=db.cfg||{};return location.href.split('#')[0]+'#g='+b64e({n:c.nome||'',t:c.tel||'',o:o.id,c:o.cli||'',a:((o.marca||'')+' '+(o.modelo||'')).trim(),i:String(o.imei||'').slice(-4),s:o.defeito||'',e:o.st==5?(o.stData||hoje()):hoje()})}
+function enviarGarantia(id){const o=db.os.find(x=>x.id==id);if(!o)return;const l=linkGarantia(o);try{navigator.clipboard.writeText(l).catch(()=>{})}catch(x){}
+ const w=wa(String(o.tel||'').split(/[\/,;]/)[0])||wa(String(o.tel2||'').split(/[\/,;]/)[0]),txt=encodeURIComponent(`Olá, ${String(o.cli||'').split(' ')[0]}! Segue o comprovante de garantia da sua O.S. nº ${o.id}: ${l}`);
+ if(w){window.open(w+'?text='+txt,'_blank');msg('Abrindo o WhatsApp. O link também foi copiado.')}else msg('Telefone do cliente não encontrado. O link foi copiado: cole no WhatsApp.')}
+function mostrarRec(){let g=null;try{g=b64d(location.hash.slice(3))}catch(e){}const R2=$('#rec'),S=(v,n)=>esc(String(v==null?'':v).slice(0,n));$('#login').style.display='none';R2.style.display='block';
+ if(!g||typeof g!='object'){R2.innerHTML='<div style="padding:30px;font:16px Arial">Link de garantia inválido.</div>';return}
+ const e=/^\d{4}-\d{2}-\d{2}$/.test(g.e)?g.e:hoje(),ate=addDias(e,90),h=(k,v)=>v?`<div><b>${k}:</b> ${v}</div>`:'',h2='font-size:15px;border-bottom:1px solid #000;margin:16px 0 6px;padding-bottom:2px';
+ R2.innerHTML=`<div style="max-width:680px;margin:0 auto;padding:24px;font:15px/1.5 Arial,sans-serif"><div style="font-size:20px;font-weight:bold">${S(g.n,60)||'Assistência técnica'}</div>${g.t?`<div>${S(g.t,30)}</div>`:''}
+ <h1 style="font-size:22px;margin:16px 0 6px">Comprovante de garantia</h1><div>O.S. nº ${S(g.o,10)} · Entrega em ${fd(e)}</div>
+ <h2 style="${h2}">Cliente e aparelho</h2>${h('Cliente',S(g.c,60))}${h('Aparelho',S(g.a,60))}${h('IMEI/Série (final)',S(g.i,4))}${h('Serviço realizado',S(g.s,120))}
+ <div style="border:2px solid #000;padding:10px;margin:16px 0"><b>Garantia de 90 dias</b>, válida até <b>${fd(ate)}</b>.</div>
+ <h2 style="${h2}">Termos</h2><ol><li>Garantia de 90 dias para o serviço executado e a peça trocada, contados da entrega. Não cobre mau uso, queda, contato com líquidos nem violação do aparelho por terceiros.</li><li>Apresente este comprovante para acionar a garantia.</li></ol>
+ <p class="noprt"><button onclick="window.print()" style="padding:8px 14px;font-size:15px">Imprimir ou salvar em PDF</button></p></div>`}
+addEventListener('hashchange',()=>location.reload());
+const TN={retorno:'Retorno em garantia',prejuizo:'Prejuízo',devolucao:'Devolução de valor'};
+const ocHTML=o=>{const l=o.oc||[];return `${l.length?`<div style="margin-top:6px"><b>Ocorrências:</b>${l.map(x=>`<div>${fd(x.data)} · ${TN[x.tipo]}${x.tipo!='retorno'?' · '+R(x.valor):''}${x.obs?' · '+esc(x.obs):''} <button class="s" data-ocd="${o.id}:${x.id}">Remover</button></div>`).join('')}</div>`:''}
+<div id="ocf${o.id}" style="display:none;margin-top:8px"><div class="g"><label>Tipo<select id="ot${o.id}"><option value="retorno">Retorno em garantia (sem valor)</option><option value="prejuizo">Prejuízo (erro que a loja pagou)</option><option value="devolucao">Devolução de valor ao cliente</option></select></label><label>Valor (R$)<input id="ov${o.id}" type="number" min="0" step="0.01"></label><label>Data<input id="od${o.id}" type="date" value="${hoje()}"></label><label>Observação<input id="on${o.id}"></label></div><p style="margin:8px 0 0"><button class="b" data-ocs="${o.id}">Registrar</button></p></div><div id="fb${o.id}" style="display:none;margin-top:8px"></div>`};
+function registrarOc(id){const o=db.os.find(x=>x.id==id),t=$('#ot'+id).value,v=+$('#ov'+id).value||0,dx=$('#od'+id).value||hoje(),ob=$('#on'+id).value.trim();
+ if(v<0)return msg('O valor não pode ser negativo.');if(t!='retorno'&&v<=0)return msg('Informe o valor (maior que zero).');
+ const w=[],ent=o.st==5?(o.stData||o.data):null;if(ent&&Math.round((Date.parse(dx+'T00:00:00Z')-Date.parse(ent+'T00:00:00Z'))/864e5)>90)w.push('fora dos 90 dias de garantia');if(o.st<4)w.push('o aparelho ainda não foi entregue');if(t=='devolucao'&&v>o.cobr)w.push('a devolução é maior que o valor cobrado');
+ if(w.length&&!ok1('Atenção: '+w.join(' e ')+'.'))return;
+ (o.oc=o.oc||[]).push({id:novoId('o'),data:dx,tipo:t,valor:t=='retorno'?0:v,obs:ob});save();draw();msg('Registrado.')}
+const telTxt=o=>[o.tel,o.tel2].filter(Boolean).join(' / ');
+function imprimirOS(id){const o=db.os.find(x=>x.id==id);if(!o)return;const ac=acessDe(o),L={ok:'OK',avaria:'AVARIA',sem:'SEM TESTE'},pe=pend(o),ps=!o.cobr?'':pe<0.005?'Pago':pe<o.cobr-0.005?'Parcial':'Não pago',f=o.pg.forma,n=o.pg.n,
+ forma=f=='vista'?'À vista':f=='parcelado'?`Parcelado em ${n}x`:(n==1?'Promissória (pagamento único)':`Promissória em ${n}x`),r=(k,v)=>`<div><b>${k}:</b> ${esc(v)}</div>`;
+ $('#prt').innerHTML=`${cabLoja()}<h1>Ordem de Serviço nº ${o.id}</h1><div>Entrada em ${fd(o.data)} · Situação: ${ST[o.st]}</div>
+ <h2>Cliente e aparelho</h2><div class="gr2">${r('Cliente',o.cli)}${r('Telefone',telTxt(o))}${r('Aparelho',((o.marca||'')+' '+(o.modelo||'')).trim())}${r('IMEI/Série',o.imei)}</div>${r('Defeito relatado',o.defeito)}${r('Senha do aparelho',o.senha?'informada':'não informada')}
+ <h2>Estado do aparelho na entrada</h2><div class="gr">${CK.map((c,i)=>`<div>${c} <b>${L[o.ent[i]]||''}</b></div>`).join('')}</div>
+ ${o.obs?`<div style="margin-top:6px"><b>Observações:</b> ${esc(o.obs)}</div>`:''}
+ <h2>Valores e pagamento</h2><div><b>Valor do serviço:</b> ${R(o.cobr)} &nbsp; <b>Forma:</b> ${forma} &nbsp; <b>${ps}</b></div>${ac.length?`<div style="margin-top:4px"><b>Acessórios:</b> ${acessTxt(ac)}</div><div><b>Total do atendimento:</b> ${R(o.cobr+acessTot(ac))}</div>`:''}
+ <h2>Termos</h2><ol><li>Garantia de 90 dias para o serviço executado e a peça trocada, contados da entrega. Não cobre mau uso, queda, contato com líquidos nem violação do aparelho por terceiros.</li><li>Aparelho não retirado em até 90 dias após o aviso de pronto poderá ser considerado abandonado.</li><li>A loja não se responsabiliza por dados e arquivos do aparelho. Faça backup antes.</li><li>Ao assinar, o cliente confirma que os dados e o estado do aparelho acima conferem e autoriza o serviço.</li></ol>
+ <div class="ass"><div>Assinatura do cliente</div><div>Responsável pela loja</div></div>`;setTimeout(()=>window.print(),50)}
+$('#osList').addEventListener('click',e=>{const d=e.target.dataset;if(d.pr)imprimirOS(d.pr);if(d.ft)abrirFotos(d.ft,true);if(d.fv)verFoto(d.fv);if(d.fd)apagarFoto(d.fd);if(d.oc){const f=$('#ocf'+d.oc);f.style.display=f.style.display=='none'?'block':'none'}if(d.ocs)registrarOc(d.ocs);if(d.ocd){const[a,b]=d.ocd.split(':'),o=db.os.find(x=>x.id==a);if(o&&ok1('Remover este registro?')){o.oc=o.oc.filter(x=>x.id!=b);save();draw();msg('Registro removido.')}}if(d.wg)enviarGarantia(d.wg);if(d.va){document.querySelector('nav button[data-t=pdv]').click();$('#so').value=d.va;$('#sp').focus()}});
+/* ===== Fotos do aparelho (só lojista) ===== */
+let fotosPend=[];const FMAX=6;
+const comp=f=>new Promise(res=>{const r=new FileReader();r.onerror=()=>res(null);r.onload=()=>{const im=new Image();im.onerror=()=>res(null);im.onload=()=>{const sc=Math.min(1,1024/Math.max(im.width,im.height)),cv=document.createElement('canvas');cv.width=Math.max(1,Math.round(im.width*sc));cv.height=Math.max(1,Math.round(im.height*sc));cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);res(cv.toDataURL('image/jpeg',.7))};im.src=r.result};r.readAsDataURL(f)});
+async function lerFotos(files,max){const out=[];for(const f of [...files]){if(out.length>=max){msg('Limite de '+FMAX+' fotos por O.S.');break}if(!/^image\//.test(f.type))continue;const d=await comp(f);if(d)out.push(d)}return out}
+function drawFotoPrev(){$('#fotoPrev').innerHTML=fotosPend.map((d,i)=>`<span style="position:relative;display:inline-block;margin:4px"><img src="${d}" alt="" style="height:70px;border-radius:6px"><button class="s" data-fx="${i}" style="position:absolute;top:0;right:0;padding:0 6px">✕</button></span>`).join('')}
+$('#fotoIn').onchange=async e=>{const f=e.target.files;if(!NUV.ses){e.target.value='';return msg('As fotos precisam do login na nuvem.')}const n=await lerFotos(f,FMAX-fotosPend.length);e.target.value='';fotosPend=fotosPend.concat(n);drawFotoPrev()};
+$('#fotoPrev').onclick=e=>{if(e.target.dataset.fx!==undefined){fotosPend.splice(+e.target.dataset.fx,1);drawFotoPrev()}};
+async function subirFotos(o,ds){let ok=0;o.fotos=o.fotos||[];for(const d of ds){const id=novoId('f');try{const r=await nuvApi('/rest/v1/os_fotos',{m:'POST',b:{id,user_id:NUV.ses.user.id,os_id:o.id,img:d},h:{Prefer:'return=minimal'}});if(r.ok){o.fotos.push(id);ok++}}catch(e){}}
+ if(ok)save();msg(ok==ds.length?'Fotos enviadas ('+ok+').':'Só '+ok+' de '+ds.length+' fotos foram enviadas. Confira a internet e se o banco de fotos foi criado no Supabase.');draw()}
+async function abrirFotos(id,toggle){const b=$('#fb'+id);if(!b)return;if(toggle&&b.style.display=='block'){b.style.display='none';return}b.style.display='block';b.textContent='Carregando fotos...';const o=db.os.find(x=>x.id==id);
+ try{if(!NUV.ses)throw 0;const r=await nuvApi('/rest/v1/os_fotos?select=id,img&order=criado&os_id=eq.'+id+'&user_id=eq.'+NUV.ses.user.id);if(!r.ok)throw 0;
+  b.innerHTML=(r.j.length?r.j.map(f=>`<span style="position:relative;display:inline-block;margin:4px"><img src="${/^data:image\/jpeg;base64,/.test(f.img)?f.img:''}" alt="Foto" data-fv="${f.id}" style="height:90px;border-radius:6px;cursor:pointer"><button class="s" data-fd="${id}:${f.id}" style="position:absolute;top:0;right:0;padding:0 6px">🗑</button></span>`).join(''):'<div style="color:var(--mut)">Nenhuma foto.</div>')+((o.fotos||[]).length<FMAX?`<div style="margin-top:6px"><label>Adicionar fotos (só você vê)<input type="file" accept="image/*" multiple data-fa="${id}"></label></div>`:'')}
+ catch(e){b.textContent='Não consegui carregar as fotos (sem internet ou banco de fotos não criado).'}}
+function verFoto(id){const i=document.querySelector('[data-fv="'+id+'"]');if(!i)return;$('#fgr img').src=i.src;$('#fgr').style.display='flex'}
+$('#fgr').onclick=()=>{$('#fgr').style.display='none'};
+async function apagarFoto(a){const[os,fid]=a.split(':'),o=db.os.find(x=>x.id==os);if(!o||!ok1('Apagar esta foto?'))return;
+ try{const r=await nuvApi('/rest/v1/os_fotos?id=eq.'+fid+'&user_id=eq.'+NUV.ses.user.id,{m:'DELETE'});if(!r.ok)throw 0;o.fotos=(o.fotos||[]).filter(x=>x!=fid);save();draw();abrirFotos(os,false);msg('Foto apagada.')}catch(e){msg('Não consegui apagar a foto.')}}
+async function apagarFotos(o){if(!NUV.ses)return;try{await nuvApi('/rest/v1/os_fotos?os_id=eq.'+o.id+'&user_id=eq.'+NUV.ses.user.id,{m:'DELETE'})}catch(e){}}
+$('#osList').addEventListener('change',async e=>{const id=e.target.dataset.fa;if(!id)return;const o=db.os.find(x=>x.id==id),n=await lerFotos(e.target.files,FMAX-(o.fotos||[]).length);e.target.value='';if(n.length){await subirFotos(o,n);abrirFotos(id,false)}});
+$('#relPrint').onclick=()=>{const t=$('#per'),v=$('#vis'),c=db.cfg||{},per=t.options[t.selectedIndex].text+($('#per').value=='c'?' ('+($('#de').value||'…')+' a '+($('#ate').value||'…')+')':'');
+ $('#prt').innerHTML='<h1>'+esc(c.nome||'Bancada')+' · Relatório</h1><p>Período: '+esc(per)+' · Mostrando: '+esc(v.options[v.selectedIndex].text)+' · Emitido em '+hoje().split('-').reverse().join('/')+'</p>'+$('#relOut').innerHTML;print()};
+/* ===== Backup ===== */
+let bkPend=null;
+$('#bkBaixar').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({sistema:'bancada',gerado:new Date().toISOString(),dados:db})],{type:'application/json'}));a.download='backup-bancada-'+hoje()+'.json';document.body.appendChild(a);a.click();a.remove();msg('Backup baixado. Guarde o arquivo em local seguro.')};
+$('#bkArq').onchange=e=>{const f=e.target.files[0];e.target.value='';bkPend=null;if(!f)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);if(j.sistema!='bancada'||!j.dados||!Array.isArray(j.dados.os))throw 0;bkPend=j.dados;$('#bkInfo').textContent='Arquivo pronto: '+j.dados.os.length+' O.S. e '+(j.dados.cli||[]).length+' clientes. Clique em Restaurar.'}catch(x){$('#bkInfo').textContent='Arquivo inválido.'}};r.readAsText(f)};
+$('#bkRest').onclick=()=>{if(!bkPend)return msg('Escolha o arquivo de backup primeiro.');if(!ok1('Isto SUBSTITUI todos os dados atuais pelo backup.'))return;db=bkPend;bkPend=null;['os','models','brands','sup','prod','sales','cli','lix'].forEach(k=>db[k]=db[k]||[]);db.cfg=db.cfg||{nome:'',logo:''};db.n=db.n||1;db.v=db.v||2;save();draw();$('#bkInfo').textContent='';msg('Backup restaurado.')};
+/* ===== Recuperar senha ===== */
+$('#lesq').onclick=async()=>{const email=$('#lemail').value.trim(),m=$('#lmsg');if(!email){m.textContent='Escreva seu e-mail no campo acima e clique de novo.';return}m.textContent='Aguarde...';
+ try{const r=await fetch(SUPA+'/auth/v1/recover',{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},body:JSON.stringify({email})});if(r.ok)m.textContent='Se esse e-mail tiver conta, enviamos um link para criar uma nova senha.';else{const j=await r.json().catch(()=>({}));m.textContent=/rate limit/i.test(JSON.stringify(j))||r.status==429?'Limite de e-mails atingido. Tente mais tarde ou peça ao dono do sistema.':'Não foi possível enviar o e-mail.'}}catch(e){m.textContent='Sem conexão com a internet.'}};
+function recSenha(){const tk=new URLSearchParams(location.hash.slice(1)).get('access_token');$('#login').style.display='block';$('#lcard').style.display='none';$('#lnova').style.display='block';
+ $('#lnok').onclick=async()=>{const sn=$('#lnsenha').value,m=$('#lnmsg');if(sn.length<6){m.textContent='A senha precisa ter pelo menos 6 caracteres.';return}
+  try{const r=await fetch(SUPA+'/auth/v1/user',{method:'PUT',headers:{apikey:KEY,'Content-Type':'application/json',Authorization:'Bearer '+tk},body:JSON.stringify({password:sn})});if(!r.ok)throw 0;
+   history.replaceState(null,'',location.href.split('#')[0]);try{localStorage.removeItem('bancada_sessao')}catch(e){}NUV.ses=null;$('#lnova').style.display='none';$('#lcard').style.display='block';$('#lmsg').style.color='';$('#lmsg').textContent='Senha alterada. Entre com a nova senha.'}catch(e){m.textContent='Não foi possível alterar. O link pode ter vencido: peça outro.'}}}
+const bissexto=y=>(y%4==0&&y%100!=0)||y%400==0;
+function anivInfo(c){if(!/^\d{4}-\d{2}-\d{2}$/.test(c.nasc||''))return null;const[y0,m,d0]=c.nasc.split('-').map(Number),h=new Date(hoje()+'T12:00:00'),y=h.getFullYear(),t=new Date(y,h.getMonth(),h.getDate(),12);
+ const ocorr=yy=>new Date(yy,m-1,(m==2&&d0==29&&!bissexto(yy))?28:d0,12);let a=ocorr(y);if(a<t)a=ocorr(y+1);return{dias:Math.round((a-t)/864e5),idade:a.getFullYear()-y0}}
+function drawAniv(){const L=db.cli.map(c=>({c,i:anivInfo(c)})).filter(x=>x.i&&x.i.dias==0);const loja=(db.cfg&&db.cfg.nome)||'';
+ $('#aniv').innerHTML=L.length?`<div class="card" style="border-left:5px solid var(--ac)"><b>🎂 Aniversariantes de hoje</b>${L.map(x=>{const w=wa(String(x.c.tel||'').split(/[\/,;]/)[0]),t=encodeURIComponent(`Olá, ${x.c.nome.split(' ')[0]}! ${loja?'Aqui é da '+loja+'. ':''}Feliz aniversário! 🎉 Desejamos muita saúde e felicidades.`);return `<div>${esc(x.c.nome)} (${x.i.idade} anos)${w?` · <a href="${w}?text=${t}" target="_blank" rel="noopener">Enviar parabéns no WhatsApp</a>`:' · sem telefone'}</div>`}).join('')}</div>`:'';
+ const b=document.querySelector('nav button[data-t=clientes]');if(b)b.textContent='Clientes'+(L.length?' 🎂'+L.length:'')}
+function draw(){drawAniv();aplicarLoja();drawOS();drawPDV();drawRel();drawProj();drawCli();drawLix()}
 nuvBoot();
 </script>
 </body>
